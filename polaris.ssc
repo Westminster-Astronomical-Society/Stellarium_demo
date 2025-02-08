@@ -1,0 +1,217 @@
+// Name: Stellarium demo script
+// License: Public Domain
+// Author: Chris Bennett
+// Version: 1.0
+// Description: Script to test Stellarium scripting features.
+
+include("settings.inc");
+include("common_objects.inc");
+include("solar_calc.js");
+
+var loc = core.getObserverLocationInfo();
+var lat = loc.latitude;
+var lon = loc.longitude;
+
+JD = core.jdFromDateString("2025-01-01T00:00:00", spec = "utc");
+
+sunrise = sunRise(JD, lat, lon, -5);
+sunset = sunSet(JD, lat, lon, -5);
+
+civTwilightMorn = civTwilightMorning(JD, lat, lon, -5);
+civTwilightEven = civTwilightEvening(JD, lat, lon, -5);
+
+nautTwilightMorn = nautTwilightMorning(JD, lat, lon, -5);
+nautTwilightEven = nautTwilightEvening(JD, lat, lon, -5);
+
+astTwilightMorn = astroTwilightMorning(JD, lat, lon, -5);
+astTwilightEven = astroTwilightEvening(JD, lat, lon, -5);
+
+// Show the Equatorial Grid
+function showEqGrid() {
+    GridLinesMgr.setFlagEquatorGrid(false);
+
+    GridLinesMgr.setColorEquatorGrid(BarneyPurple);
+    GridLinesMgr.setFlagEquatorGrid(true);
+    core.wait(3);
+
+    GridLinesMgr.setFlagEquatorGrid(false);
+    core.wait(0.5);
+
+    GridLinesMgr.setColorEquatorGrid(DirtyPurple);
+    GridLinesMgr.setFlagEquatorGrid(true);
+}
+
+// Show the Azimuthal Grid
+function showAzGrid() {
+    GridLinesMgr.setFlagAzimuthalGrid(false);
+
+    GridLinesMgr.setColorAzimuthalGrid(TrueGreen);
+    GridLinesMgr.setFlagAzimuthalGrid(true);
+    core.wait(3);
+
+    GridLinesMgr.setFlagAzimuthalGrid(false);
+    core.wait(0.5);
+
+    GridLinesMgr.setColorAzimuthalGrid(VeryDarkGreen);
+    GridLinesMgr.setFlagAzimuthalGrid(true);
+}
+
+// Pan the current view up and down. Distance as fraction of fov.
+function altPan(distance, duration = 5) {
+    var az = core.getViewAzimuthAngle();
+    var alt = core.getViewAltitudeAngle();
+    var fov = StelMovementMgr.getCurrentFov();
+    core.moveToAltAzi(alt + fov * distance, az, duration);
+    core.wait(duration);
+}
+
+// Pan the current view up and down. Distance as fraction of fov.
+function decPan(distance, duration = 5) {
+    var ra = core.getViewRaJ2000Angle();
+    var dec = core.getViewDecJ2000Angle();
+    var fov = StelMovementMgr.getCurrentFov();
+    core.moveToRaDecJ2000(ra, dec + fov * distance, duration);
+    core.wait(duration);
+}
+
+// Main script entry Point
+function main() {
+    setup()
+    core.setDate(sunset, spec = "local");
+
+    StelMovementMgr.lookZenith();
+    StelMovementMgr.lookNorth();
+    StelMovementMgr.zoomTo(180, 3);
+    core.wait(3);
+
+    // fast forward to nautical twilight
+    core.setTimeRate(800);
+    core.waitFor(nautTwilightEven, spec = "local");
+    core.setTimeRate(0);
+    core.wait(3);
+
+    // Show the Equatorial Grid
+    showEqGrid();
+
+    // Show Ursa Minor
+    core.selectConstellationByName("Ursa Minor");
+    ConstellationMgr.setFlagLines(true);
+    core.moveToSelectedObject();
+    StelMovementMgr.zoomTo(60, 3);
+    core.wait(3);
+    altPan(0.25, 5);
+    core.wait(5);
+
+    // circumpolar constellations
+    ConstellationMgr.setFlagConstellationPick(false);
+    ConstellationMgr.setFlagIsolateSelected(true);
+    ConstellationMgr.deselectConstellations();
+
+    core.setTimeRate(800);
+    StelMovementMgr.zoomTo(90, 3);
+
+    for (var i = 0; i < circumpolar.length; i++) {
+        core.selectConstellationByName(circumpolar[i]);
+        StelMovementMgr.deselection();
+        core.wait(2);
+    }
+
+    core.waitFor(midnight, spec = "local");
+    core.setTimeRate(0);
+
+    // Show precession of the equinoxes.
+    core.setDate("1944-01-01T19:00:00", spec = "local");
+
+    StelMovementMgr.zoomTo(40, 3);
+
+    ConstellationMgr.setFlagConstellationPick(true);
+    core.selectConstellationByName("Ursa Minor");
+    LandscapeMgr.setFlagLandscape(false);
+    LandscapeMgr.setFlagAtmosphere(false);
+
+    core.selectObjectByName("Polaris");
+    StelMovementMgr.autoZoomIn(3);
+    core.wait(3);
+    altPan(.1, 5);
+    StelMovementMgr.deselection();
+
+    // increment the date by 732 sidereal days for 300 years
+    for (var i = 0; i < 150; i++) {
+        core.setDate("+732days sidereal");
+        core.wait(0.1);
+    }
+    core.wait(3);
+
+    core.setDate("2024-01-01T19:00:00", spec = "local");
+    StelMovementMgr.zoomTo(90, 3);
+    core.wait(3);
+
+    ConstellationMgr.setFlagConstellationPick(false);
+    ConstellationMgr.setFlagIsolateSelected(false);
+    ConstellationMgr.setFlagLines(true);
+
+    // roll time back 1000 years
+    for (var i = 0; i < 175; i++) {
+        core.setDate("-10070days sidereal");
+        core.wait(0.1);
+    }
+
+    core.wait(3);
+
+    core.selectObjectByName("Thuban");
+    StelMovementMgr.autoZoomIn(3);
+    core.wait(3);
+    L1 = LabelMgr.labelObject("α Dra (Thuban)", "Thuban", visible = true,
+        fontSize = 18, fontColor = "#999999", side = "E", labelDistance = 25.0);
+    L2 = LabelMgr.labelObject("2787 BCE", "Thuban", visible = true,
+        fontSize = 18, fontColor = "#999999", side = "W", labelDistance = 25.0);
+    altPan(0.2, 5);
+    core.wait(5);
+    LabelMgr.deleteAllLabels();
+    StelMovementMgr.autoZoomOut(3);
+    core.wait(3);
+    StelMovementMgr.deselection();
+    core.wait(3);
+
+    // show the North Celestial Pole (NCP) and the dates of the pole star
+    core.setDate(astTwilightEven, spec = "local");
+
+    LandscapeMgr.setFlagAtmosphere(false);
+    LandscapeMgr.setFlagLandscape(false);
+    core.moveToRaDecJ2000("17h 45m 00s", "66d 40m 00s", 5);
+    StelMovementMgr.zoomTo(90, 5);
+    core.setMountMode("equatorial");
+
+    var coords = [[262.3809, 41.4841], [247.5013, 44.7778], [233.0579, 50.6631],
+    [219.1664, 58.6822], [205.8050, 68.2827], [192.8191, 78.9105], [0.0000, 90.0000],
+    [347.1138, 79.0053], [333.9185, 68.6632], [320.1721, 59.5315], [305.6326, 52.1678],
+    [290.0571, 47.1301], [273.2061, 44.9761]]
+
+
+    var L = ["10000 BCE", "8000 BCE", "6000 BCE", "4000 BCE", "2000 BCE", "0",
+        "2000 CE", "4000 CE", "6000 CE", "8000 CE", "10000 CE", "12000 CE", "14000 CE"]
+
+    // for ra and dec in coords array add a marker and label
+    for (var i = 0; i < coords.length; i++) {
+        MarkerMgr.markerEquatorial(coords[i][0], coords[i][1], j2000epoch = true,
+            visible = true, mtype = "cross", color = "#910001", size = 12);
+
+        LabelMgr.labelEquatorial(L[i], coords[i][0], coords[i][1], visible = true,
+            fontSize = 16, fontColor = "#910001", side = "N", labelDistance = 25.0);
+
+        core.wait(0.5);
+    }
+    GridLinesMgr.setFlagEclipticJ2000Poles(true);
+    core.wait(10);
+
+    GridLinesMgr.setFlagEclipticJ2000Poles(false);
+    core.setMountMode("azimuthal");
+    MarkerMgr.deleteAllMarkers();
+    LabelMgr.deleteAllLabels();
+}
+
+main();
+// pauseKey();
+
+cleanup();
+core.goHome();

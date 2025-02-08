@@ -1,0 +1,38 @@
+// Name: Sunrise and Sunset Times test
+// License: Public Domain
+// Author: Chris Bennett
+// Version: 1.0
+// Description: Script to test solar calculations.
+
+include("solar_calc.js");
+
+var loc = core.getObserverLocationInfo();
+var lat = loc.latitude;
+var lon = loc.longitude;
+
+JD = 2460676.500000
+
+sunrise = sunRise(JD, lat, lon, -5);
+sunset = sunSet(JD, lat, lon, -5);
+
+civTwilightMorn = civTwilightMorning(JD, lat, lon, -5);
+civTwilightEven = civTwilightEvening(JD, lat, lon, -5);
+
+nautTwilightMorn = nautTwilightMorning(JD, lat, lon, -5);
+nautTwilightEven = nautTwilightEvening(JD, lat, lon, -5);
+
+astTwilightMorn = astroTwilightMorning(JD, lat, lon, -5);
+astTwilightEven = astroTwilightEvening(JD, lat, lon, -5);
+
+core.debug("Sunrise: " + sunrise);
+core.debug("Sunset: " + sunset);
+core.debug("Civil Twilight Morning: " + civTwilightMorn);
+core.debug("Civil Twilight Evening: " + civTwilightEven);
+core.debug("Nautical Twilight Morning: " + nautTwilightMorn);
+core.debug("Nautical Twilight Evening: " + nautTwilightEven);
+core.debug("Astronomical Twilight Morning: " + astTwilightMorn);
+core.debug("Astronomical Twilight Evening: " + astTwilightEven);
+
+
+
+

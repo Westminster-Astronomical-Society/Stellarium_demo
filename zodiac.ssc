@@ -1,0 +1,128 @@
+// Name: Stellarium demo script
+// License: Public Domain
+// Author: Chris Bennett
+// Version: 1.0
+// Description: Script to test Stellarium scripting features.
+
+include("settings.inc");
+include("common_objects.inc");
+include("solar_calc.js");
+
+var loc = core.getObserverLocationInfo();
+var lat = loc.latitude;
+var lon = loc.longitude;
+
+JD = core.jdFromDateString("2025-01-01T00:00:00", spec = "utc");
+
+sunrise = sunRise(JD, lat, lon, -5);
+sunset = sunSet(JD, lat, lon, -5);
+
+civTwilightMorn = civTwilightMorning(JD, lat, lon, -5);
+civTwilightEven = civTwilightEvening(JD, lat, lon, -5);
+
+nautTwilightMorn = nautTwilightMorning(JD, lat, lon, -5);
+nautTwilightEven = nautTwilightEvening(JD, lat, lon, -5);
+
+astTwilightMorn = astroTwilightMorning(JD, lat, lon, -5);
+astTwilightEven = astroTwilightEvening(JD, lat, lon, -5);
+
+// Show the Equatorial Grid
+function showEqGrid() {
+    GridLinesMgr.setFlagEquatorGrid(false);
+    core.wait(2);
+
+    GridLinesMgr.setColorEquatorGrid(BarneyPurple);
+    GridLinesMgr.setFlagEquatorGrid(true);
+    core.wait(5);
+
+    GridLinesMgr.setFlagEquatorGrid(false);
+    core.wait(0.5);
+
+    GridLinesMgr.setColorEquatorGrid(DirtyPurple);
+    GridLinesMgr.setFlagEquatorGrid(true);
+}
+
+// Show the Azimuthal Grid
+function showAzGrid() {
+    GridLinesMgr.setFlagAzimuthalGrid(false);
+    core.wait(2);
+
+    GridLinesMgr.setColorAzimuthalGrid(TrueGreen);
+    GridLinesMgr.setFlagAzimuthalGrid(true);
+    core.wait(5);
+
+    GridLinesMgr.setFlagAzimuthalGrid(false);
+    core.wait(0.5);
+
+    GridLinesMgr.setColorAzimuthalGrid(VeryDarkGreen);
+    GridLinesMgr.setFlagAzimuthalGrid(true);
+}
+
+// Pan the current view up and down. Distance as fraction of fov.
+function altPan(distance, duration = 5) {
+    var az = core.getViewAzimuthAngle();
+    var alt = core.getViewAltitudeAngle();
+    var fov = StelMovementMgr.getCurrentFov();
+    core.moveToAltAzi(alt + fov * distance, az, duration);
+    core.wait(duration);
+}
+
+// Pan the current view up and down. Distance as fraction of fov.
+function decPan(distance, duration = 5) {
+    var ra = core.getViewRaJ2000Angle();
+    var dec = core.getViewDecJ2000Angle();
+    var fov = StelMovementMgr.getCurrentFov();
+    core.moveToRaDecJ2000(ra, dec + fov * distance, duration);
+    core.wait(duration);
+}
+
+// Main script entry Point
+function main() {
+    setup()
+    core.setDate(sunset, spec = "local");
+
+    StelMovementMgr.lookZenith();
+    StelMovementMgr.lookNorth();
+    StelMovementMgr.zoomTo(180, 3);
+    core.wait(3);
+
+    // Zodiac constellations
+    ConstellationMgr.setFlagConstellationPick(false);
+    ConstellationMgr.setFlagIsolateSelected(true);
+    ConstellationMgr.deselectConstellations();
+    ConstellationMgr.setFlagLines(true);
+
+    StelMovementMgr.lookSouth();
+    GridLinesMgr.setFlagEclipticLine(true);
+    GridLinesMgr.setFlagEquatorLine(true);
+
+    core.setDate(nautTwilightEven, spec = "local");
+    core.setTimeRate(1800);
+    core.wait(3);
+
+    LandscapeMgr.setFlagAtmosphere(false);
+
+    for (var i = 0; i < zodiac.length; i++) {
+        core.selectConstellationByName(zodiac[i]);
+        StelMovementMgr.deselection();
+        core.wait(3);
+    }
+
+    core.waitFor("2025-02-06T18:00:00", spec = "local");
+    core.setTimeRate(1);
+
+    core.wait(5);
+
+    LandscapeMgr.setFlagAtmosphere(true);
+    GridLinesMgr.setFlagEclipticLine(false);
+    GridLinesMgr.setFlagEquatorLine(false);
+
+    ConstellationMgr.deselectConstellations();
+    ConstellationMgr.setFlagLines(false);
+}
+
+main();
+pauseKey();
+
+cleanup();
+core.goHome();

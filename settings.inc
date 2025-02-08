@@ -117,7 +117,7 @@ function cleanup() {
     core.setGuiVisible(true);
 }
 
-// Pause the script until key press.
+// Pause the script until key press "L".
 function pauseKey() {
     var timerate = core.getTimeRate();
     core.setTimeRate(0.05);

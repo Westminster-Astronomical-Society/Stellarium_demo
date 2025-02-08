@@ -1,0 +1,49 @@
+//
+// Author: Alexander Wolf
+//modified Al Ansorge to show path of Jupiter
+// Version: 2.2
+// License: Public Domain
+// Name: Analemma
+// Description: A demonstration of the analemma - the path of the Sun across the sky during the year on Earth.
+//
+
+include("i18n.inc");
+
+//core.goHome();
+//var JD = core.getJDay();
+var color = "#aa0000";
+core.setTimeRate(3600);
+core.clear("natural");
+core.wait(1);
+core.setObserverLocation(0, 89, 1, 1, "", "Earth");
+core.setDate("2024-12-10T19:21:01");
+core.selectObjectByName("Jupiter", false);
+StelMovementMgr.setFlagTracking(false);
+MarkerMgr.deleteAllMarkers(false);
+LandscapeMgr.setFlagAtmosphere(0);
+StelMovementMgr.autoZoomIn(2);
+//StelMovementMgr.panView 	(0,0	) ;	
+
+StelMovementMgr.moveViewport 	( 0,0,5);
+core.wait(5);
+//StelMovementMgr.moveViewport 	( .0020,.0020,5);
+core.selectObjectByName("Jupiter", false);
+StelMovementMgr.panView 	(.002,.0005) ;	
+core.wait(20);
+
+//StelMovementMgr.zoomTo(80, 1);
+//core.wait(2);
+//GridLinesMgr.setFlagAzimuthalGrid(true);
+//GridLinesMgr.setFlagMeridianLine(true);
+//GridLinesMgr.setFlagEclipticLine (true);
+//StelMovementMgr.zoomTo(100, 3);
+
+core.wait(5);
+
+LabelMgr.deleteAllLabels();
+MarkerMgr.deleteAllMarkers();
+core.setTimeRate(1);
+core.clear("natural");
+core.goHome();
+//core.setGuiVisible(true);
+

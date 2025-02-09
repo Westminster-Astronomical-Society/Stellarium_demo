@@ -1,8 +1,8 @@
-// Name: utilities.inc
+// Name: settings.inc
 // License: Public Domain
 // Author: Christopher Bennett
 // Version: 1.0, 2025-01-22
-// Description: This file contains utility functions for Stellarium scripts
+// Description: This file contains settings and utility functions for Stellarium scripts
 
 include("save_state.inc");
 
@@ -29,7 +29,20 @@ BloodRed = core.vec3f(0.56863, 0.00000, 0.00392)      // #910001
 DarkRed = core.vec3f(0.37647, 0.12549, 0.12941)       // #602021
 
 
-// Set up the environment for the script
+/**
+ * Sets up the default display settings for the script. The current environment is
+ * is saved under the name "RestoreState" before the settings are applied.
+ * 
+ * The settings applied are:
+ * - Clears the current display to "natural" mode.
+ *   (az mount, atmosphere, landscape, no lines, labels or markers)
+ * - Configures grid lines colors.
+ * - Sets font sizes for solar system objects and stars.
+ * - Configures star and constellation settings.
+ * - Sets observer location and landscape.
+ * - Hides the GUI.
+ * - Saves the state with the name "defaultState".
+ */
 function setup() {
     // Wait... Stellarium needs to start completely.
     core.debug("Setting up environment");
@@ -77,9 +90,19 @@ function setup() {
     saveState("defaultState");
 }
 
-// Set up the environment for constellations tour
+/**
+ * Sets up the display settings for a constellation tour.
+ * 
+ * The settings applied are:
+ * - Clears the current display to "deepspace" mode.
+ *   (Eq mount, no atmosphere, landscape etc. No planets, lines, labels or markers)
+ * - Sets absolute and relative star scales to 1.0.
+ * - Adjusts constellation font size, art intensity, and colors for lines, labels, and boundaries.
+ * - Configures constellation line thickness and selection flags.
+ * - Enables the display of constellation lines, art, and boundaries.
+ * - Saves the current state under the name "constellationState".
+ */
 function setupConstellations() {
-    // Eq mount, no atmosphere, landscape etc. No planets, lines, labels or markers.
     core.clear("deepspace");
 
     StelSkyDrawer.setAbsoluteStarScale(1.0);
@@ -102,9 +125,14 @@ function setupConstellations() {
     saveState("constellationState");
 }
 
-// Try to undo script settings that will mess up Stellarium's expected operation
+/**
+ * Cleans up the application state by restoring the previously saved state.
+ * It also: 
+ * - Manually resets the Solar System and Star font size to their default values (13).
+ * - Deletes all markers and labels.
+ * - Makes the GUI visible.
+ */
 function cleanup() {
-    // reset view to home.
     restoreState("RestoreState");
 
     // There is no getter for SolarSystem and StarMgr font size, restore them manually.
@@ -117,7 +145,12 @@ function cleanup() {
     core.setGuiVisible(true);
 }
 
-// Pause the script until key press "L".
+/**
+ * Sets the time rate in the core system to a very slow rate (0.05) and waits for
+ * the user to press the "L" key then restores the original time rate.
+ *
+ * Note: This function uses a blocking wait loop to effectively pause the script.
+ */
 function pauseKey() {
     var timerate = core.getTimeRate();
     core.setTimeRate(0.05);

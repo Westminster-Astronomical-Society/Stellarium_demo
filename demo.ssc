@@ -26,10 +26,14 @@ nautTwilightEven = nautTwilightEvening(JD, lat, lon, -5);
 astTwilightMorn = astroTwilightMorning(JD, lat, lon, -5);
 astTwilightEven = astroTwilightEvening(JD, lat, lon, -5);
 
-// Show the Equatorial Grid
+/**
+ * Toggles the visibility of the equatorial grid and dims the 
+ * colors after a three second delay.
+ * 
+ * Colors are defined in the settings.inc file.
+ */
 function showEqGrid() {
     GridLinesMgr.setFlagEquatorGrid(false);
-    core.wait(2);
 
     GridLinesMgr.setColorEquatorGrid(BarneyPurple);
     GridLinesMgr.setFlagEquatorGrid(true);
@@ -42,10 +46,14 @@ function showEqGrid() {
     GridLinesMgr.setFlagEquatorGrid(true);
 }
 
-// Show the Azimuthal Grid
+/**
+ * Toggles the visibility of the azimuthal grid and dims the 
+ * colors after a three second delay.
+ * 
+ * Colors are defined in the settings.inc file.
+ */
 function showAzGrid() {
     GridLinesMgr.setFlagAzimuthalGrid(false);
-    core.wait(2);
 
     GridLinesMgr.setColorAzimuthalGrid(TrueGreen);
     GridLinesMgr.setFlagAzimuthalGrid(true);
@@ -58,7 +66,13 @@ function showAzGrid() {
     GridLinesMgr.setFlagAzimuthalGrid(true);
 }
 
-// Pan the current view up and down. Distance as fraction of fov.
+/**
+ * Pans the view by a specified distance in altitude. This is used in the
+ * AltAz mount mode. For equatorial mode, use decPan.
+ *
+ * @param {number} distance - The distance as a fraction of the current fov.
+ * @param {number} [duration=5] - The duration of the movement in seconds.
+ */
 function altPan(distance, duration = 5) {
     var az = core.getViewAzimuthAngle();
     var alt = core.getViewAltitudeAngle();
@@ -67,7 +81,13 @@ function altPan(distance, duration = 5) {
     core.wait(duration);
 }
 
-// Pan the current view up and down. Distance as fraction of fov.
+/**
+ * Pans the view by a specified distance in altitude. This is used in the
+ * EQ mount mode. For azimuthal mode, use altPan.
+ *
+ * @param {number} distance - The distance as a fraction of the current fov.
+ * @param {number} [duration=5] - The duration of the movement in seconds.
+ */
 function decPan(distance, duration = 5) {
     var ra = core.getViewRaJ2000Angle();
     var dec = core.getViewDecJ2000Angle();

@@ -151,7 +151,7 @@ function main() {
         core.wait(2);
     }
 
-    core.waitFor("2025-02-06T04:30:00", spec = "local");
+    core.waitFor("+3hours", spec = "local");
     core.setTimeRate(0);
     core.wait(5);
 
@@ -181,7 +181,7 @@ function main() {
         core.wait(4);
     }
 
-    core.waitFor("2025-02-06T18:30:00", spec = "local");
+    core.waitFor("+10hours", spec = "local");
 
     // Constellations Tour
     setupConstellations();

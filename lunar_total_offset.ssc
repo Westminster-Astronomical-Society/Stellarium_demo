@@ -1,0 +1,55 @@
+//
+// Name: Total Lunar Eclipse
+// License: Public Domain
+// Author: Matthew Gates
+// Version: 1.0
+// Description: mod by Al. Script to demonstrate a total lunar eclipse.
+//
+
+core.wait(1);
+core.clear("natural");
+LandscapeMgr.setFlagLandscape(false);
+LandscapeMgr.setFlagAtmosphere(false);
+LandscapeMgr.setFlagFog(false);
+core.wait(1);
+core.setDate("2025:03:14T04:31:00");
+core.selectObjectByName("Moon",false);
+StelMovementMgr.setFlagTracking(true);
+core.wait(2);
+StelMovementMgr.autoZoomIn(2);
+core.setTimeRate(250);
+
+
+for (i=0; i<1200; i++)
+{
+moonalt= core.getObjectInfo("Moon")["altitude"];
+moonaz= core.getObjectInfo("Moon")["azimuth"];
+//moonalt= core.getObjectInfo("Moon")["altitude-geometric"];
+//moonaz= core.getObjectInfo("Moon")["azimuth-geometric"];
+//core.output (i+"   "+moonalt +"   "+ moonaz);
+core.moveToAltAzi(moonalt+.12,moonaz,0);
+core.wait(.001);
+}
+
+
+LabelMgr.labelHorizon("A to continue",300,1600,"true",32,"#fcf3cf","true",30000);
+//keypress press A key to continue
+kp = 0
+oa = LandscapeMgr.getFlagAtmosphere();
+while (kp == 0)
+{
+ca = LandscapeMgr.getFlagAtmosphere();
+core.wait(0.05); // This is needed in Stellarium version 1.0
+if (ca != oa)
+	{
+	kp = 1
+	}
+}
+LandscapeMgr.setFlagAtmosphere(oa);
+
+LabelMgr.deleteAllLabels();
+MarkerMgr.deleteAllMarkers();
+core.setTimeRate(1);
+core.clear("natural");
+core.goHome();
+

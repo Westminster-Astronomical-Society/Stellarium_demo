@@ -29,7 +29,7 @@ function fastForward(rate, wait = "L") {
         LabelMgr.deleteLabel(L);
     }
     else {
-        core.waitFor(wait, spec = "local");
+        core.waitFor(wait, spec = "utc");
         core.setTimeRate(timerate);
     }
 }

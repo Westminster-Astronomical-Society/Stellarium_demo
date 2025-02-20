@@ -1,0 +1,65 @@
+// Name: Stellarium-To-Video
+// License: Public Domain
+// Author: CMB
+// Version: 1.0
+// Description: A Script for creating Frames for Stellarium Videos
+
+
+SolarSystem.setMoonScale (2.5);
+
+core.setDate("2025-03-13T19:30:00", spec = "local");
+core.goHome();
+core.wait(5);
+SolarSystem.setFlagMoonScale (true);
+StelMovementMgr.lookZenith();
+StelMovementMgr.lookNorth();
+StelMovementMgr.zoomTo(180, 3);
+core.wait(3);
+
+core.moveToAltAzi(20, 105, 4);
+StelMovementMgr.zoomTo(60, 4);
+core.wait(4);
+
+for (var i = 0; i < 240; i++) {
+   core.setDate("+1 minute", spec = "local");
+    core.wait(.05);
+    }
+
+// alt and az of the Moon at the beginning of the eclipse
+// (for the observer location of Bear Branch)
+
+var moonAltitude = 49.367482605618264;
+var moonAzimuth = 149.93285594472988;
+
+var startTime = "2025-03-13T23:55:28"
+
+LandscapeMgr.setFlagLandscape(false);
+LandscapeMgr.setFlagAtmosphere(false);
+LandscapeMgr.setFlagFog(false);
+SolarSystem.setFlagPlanets(false);
+StarMgr.setFlagStars(false);
+SolarSystem.setFlagMoonScale (false);
+StelMovementMgr.zoomTo(0.5, 4);
+
+
+core.setDate(startTime, spec = "local");
+core.moveToAltAzi(moonAltitude + .3, moonAzimuth,0);
+core.wait(5);
+SolarSystem.setFlagPlanets(true);
+StarMgr.setFlagStars(true);
+
+// loop to advance time 1 second for 4 minutes
+for (var i = 0; i < 480; i++) {
+    core.setDate("+0.25 second");
+    core.wait(.02);
+    }
+StelMovementMgr.zoomTo(2, 3);
+core.wait(3);
+
+for (var i = 0; i < 724; i++) {
+   core.setDate("+30 seconds", spec = "local");
+   var  alt = core.getObjectInfo("Moon")["altitude"];
+   var  az = core.getObjectInfo("Moon")["azimuth"];
+    core.moveToAltAzi(alt+.345 - i*0.0003, az, 0);
+    core.wait(.05);
+    }
